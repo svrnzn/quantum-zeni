@@ -50,8 +50,7 @@ class Spin:
         return U_eff
 
     def click_probability(self, state):
-        modifier = self.projector1.overlap(state)
-        return modifier * self.e1.overlap(state)
+        return self.alpha * self.dt * self.projector1.overlap(state)**2
 
 
     def step(self, state):
@@ -70,7 +69,7 @@ class Spin:
     def run(self, state0, T):
         trajectory = [state0]
         state = state0
-        for i, t in enumerate(np.arange(0, T + self.dt, self.dt)):
+        for t in np.arange(0, T + self.dt, self.dt):
             state_dt = self.step(state)
             trajectory.append(state_dt)
             state = state_dt
