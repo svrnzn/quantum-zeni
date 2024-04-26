@@ -11,6 +11,7 @@ class SimulationParameters:
     dt: float
     omegaS: float
     state0: qutip.Qobj
+    force_no_click : bool
 
 
 def state_to_theta(state):
@@ -50,27 +51,38 @@ class Spin:
         return U_eff
 
     def click_probability(self, state):
-        return self.alpha * self.dt * self.projector1.overlap(state)**2
+        return self.alpha * self.dt * self.projector1.overlap(state)**2# Note that I'm taking the overlap with the projector.
 
 
-    def step(self, state):
-        r = self.rng.random()
-        click = r < self.click_probability(state)
-        if click:
-
+    def step(self, state, force_no_click=False):
+        def click_step():
             return qutip.basis(2, 1)
         
-        else:
+
+        def no_click_step(state):
             state_dt = self.get_U_eff(state) * state
 
             return state_dt.unit()
+        
+
+        if force_no_click:
+            return no_click_step(state)
+        
+        else:
+            r = self.rng.random()
+            click = r < self.click_probability(state)
+            if click:
+                return click_step()
+            
+            else:
+                return no_click_step(state)
 
 
-    def run(self, state0, T):
+    def run(self, state0, T, force_no_click=False):
         trajectory = [state0]
         state = state0
         for t in np.arange(0, T + self.dt, self.dt):
-            state_dt = self.step(state)
+            state_dt = self.step(state, force_no_click)
             trajectory.append(state_dt)
             state = state_dt
 
