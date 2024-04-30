@@ -12,8 +12,9 @@ class DimerParameters:
     Nt : int
     T : float
     dt : float
-    t_eval : np.array 
     state0: qutip.Qobj
+    force_no_click : bool = False
+    t_eval : np.array = None
 
 
 def state_to_theta(rho):

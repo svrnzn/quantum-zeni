@@ -6,16 +6,15 @@ import dimer_stages as stages
 # lmbd_1_list = np.array([0, .7, 1.1, 2/np.sqrt(3), 1.5, 3])
 lmbd_1_list = np.array([0])
 # lmbd_2_list = np.array([0, .7, 1.5, 3, 3.2, 4.5, 6, 7.5])
-lmbd_2_list = np.array([.7, .9, 1.1, 1.5, 3, 4.5])
-# lmbd_2_list = np.array([.9])
-Nt = 10**2
-T = 10
+lmbd_2_list = np.array([.7, .75, .8, .9, 1.1, 1.5, 3])
+# lmbd_2_list = np.array([1.1])
+Nt = 1
+T = 1000
 dt = .01
-delT = T/2/100
 omegaS = 1
+force_no_click = True
 
 
-t_eval = np.arange(T/2, T+delT, delT)
 state0 = qutip.tensor(qutip.basis(2, 1), qutip.basis(2, 1))
 HS = omegaS * (qutip.tensor(qutip.sigmax(), qutip.qeye(2))
                + qutip.tensor(qutip.qeye(2), qutip.sigmax()))
@@ -36,5 +35,13 @@ def get_povm(lmbd_1, lmbd_2, omegaS): # ! Wrong nomenclature here.
     return [M1_1_L, M1_1_R, M1_2]
 
 
-sim_list = [stages.DimerParameters(HS, lmbd_1, lmbd_2, get_povm(lmbd_1, lmbd_2, omegaS), Nt, T, dt, state0)
+sim_list = [stages.DimerParameters(HS,
+                                   lmbd_1,
+                                   lmbd_2,
+                                   get_povm(lmbd_1, lmbd_2, omegaS),
+                                   Nt,
+                                   T,
+                                   dt,
+                                   state0,
+                                   force_no_click)
             for lmbd_1, lmbd_2 in itertools.product(lmbd_1_list, lmbd_2_list)]

@@ -3,12 +3,14 @@ import numpy as np
 import itertools
 import dimer_stages as stages
 
-# lmbd_1_list = np.array([0, .7, 1.1, 2/np.sqrt(3), 1.5, 3])
-lmbd_1_list = np.array([0])
+lmbd_1_list = np.array([.7, 1.1])
+# lmbd_1_list = np.array([2/np.sqrt(3), 1.5, 3])
+# lmbd_1_list = np.array([0])
 # lmbd_1_list = np.array([.7, 1.1, 1.5, 3])
 # lmbd_2_list = np.array([0, .7, 1.5, 3, 3.2, 4.5, 6, 7.5])
-# lmbd_2_list = np.array([.7, 1.5, 3, 4.5])
-lmbd_2_list = np.array([1.1])
+lmbd_2_list = np.array([0, .7, 1.5, 3, 4.5])
+# lmbd_2_list = np.array([.9])
+# lmbd_2_list = np.array([0, .7, .9, 1.5, 3, 4.5])
 Nt = 10**2
 T = 100
 dt = .01
@@ -38,5 +40,5 @@ def get_povm(lmbd_1, lmbd_2, omegaS): # ! Wrong nomenclature here.
     return [M1_1_L, M1_1_R, M1_2]
 
 
-sim_list = [stages.DimerParameters(HS, lmbd_1, lmbd_2, get_povm(lmbd_1, lmbd_2, omegaS), Nt, T, dt, t_eval, state0)
+sim_list = [stages.DimerParameters(HS, lmbd_1, lmbd_2, get_povm(lmbd_1, lmbd_2, omegaS), Nt, T, dt, state0, t_eval=t_eval)
             for lmbd_1, lmbd_2 in itertools.product(lmbd_1_list, lmbd_2_list)]
