@@ -29,7 +29,8 @@ class ManyZenoMcsolve(ManyZeno):
                              tlist,
                              self.c_ops,
                              ntraj=ntraj,
-                             options={"keep_runs_results" : True})
+                             options={"keep_runs_results" : True,
+                                      "norm_steps" : 10})
 
 
 class ManyZenoTrotter(ManyZeno):
@@ -54,7 +55,7 @@ class ManyZenoTrotter(ManyZeno):
     def compute_H_eff(self):
         H_eff = self.H_S
         for E in self.e_ops:
-            H_eff -= 1j/2 * E 
+            H_eff -= 1j/2 * E
 
         return H_eff
 
@@ -94,7 +95,7 @@ class ManyZenoTrotter(ManyZeno):
         state = psi0
         traj = len(tlist) * [psi0]
         t_idx = 0
-        for i, t in enumerate(np.arange(0, tlist[-1]+self.dt, self.dt)):
+        for i, t in enumerate(np.arange(0, tlist[-1]+self.dt/2, self.dt)):
             if np.isclose(t, tlist[t_idx]):
                 traj[t_idx] = state
                 t_idx += 1
