@@ -1,7 +1,7 @@
-import itertools
 import dimer_config as c
 import dimer
 import many_zeno
+import dimer_gutzwiller
 from pickle import dump
 import concurrent
 
@@ -22,6 +22,16 @@ def run_simulation(sp):
                                     sp.c_ops,
                                     sp.ntraj,
                                     sp.no_click)
+        
+    elif sp.solver == "gutzwiller":
+        results = dimer_gutzwiller.gusolve(sp.H_S,
+                                           sp.psi0,
+                                           sp.dt,
+                                           sp.t_eval,
+                                           sp.c_ops,
+                                           sp.ntraj,
+                                           sp.no_click)
+    
 
     f = open(f"data/{str(sp)}.pkl", "wb")
     dump([sp, results], f)
