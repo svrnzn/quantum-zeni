@@ -32,6 +32,12 @@ class DimerParameters:
         return f_name
 
 
+@dataclass
+class DimerGutzwillerLockedParameters(DimerParameters):
+    c_ops_multi : list[int] = None
+    solver = "gutzwiller-locked"
+
+
 def pstate_to_yz_bloch(pstate):
     y = 2 * pstate[1, 0].imag
     z = (pstate[0, 0] - pstate[1, 1]).real
@@ -48,7 +54,7 @@ def get_H_S(omega_S):
     return H_S
 
 
-def get_c_ops(lmbd_1, lmbd_2, omega_S):
+def get_c_ops(lmbd_1, lmbd_2, omega_S, multi=False):
     gamma_1 = 4 * omega_S * lmbd_1
     gamma_2 = 4 * omega_S * lmbd_2
     E_1_L = gamma_1 * qutip.tensor((qutip.qeye(2)-qutip.sigmaz())/2,
@@ -61,7 +67,63 @@ def get_c_ops(lmbd_1, lmbd_2, omega_S):
     c1_R = E_1_R.sqrtm()
     c11 = E_2.sqrtm()
 
-    return [c1_L, c1_R, c11]
+    if multi:
+        return [c1_L, c1_R, c11], [1, 1, 2]
+    else:
+        return [c1_L, c1_R, c11]
+
+
+def get_H_S_1(omega_S):
+    H_S = omega_S * qutip.sigmax()
+    
+    return H_S
+
+
+def get_c_ops_1(lmbd_1, lmbd_2, omega_S, multi=False):
+    gamma_1 = 4 * omega_S * lmbd_1
+    gamma_2 = 4 * omega_S * lmbd_2
+    E_1 = gamma_1 * (qutip.qeye(2)-qutip.sigmaz()) / 2
+    E_2 = gamma_2 * (qutip.qeye(2)-qutip.sigmaz()) / 2
+    c1 = E_1.sqrtm()
+    c11 = E_2.sqrtm()
+
+    if multi:
+        return [c1, c11], [1, 2]
+    else:
+        return [c1, c11]
+
+
+def get_gutz_locked_sim_list(lmbd_1_list,
+                             lmbd_2_list,
+                             omega_S_list,
+                             psi0_list,
+                             t_eval_list,
+                             ntraj_list,
+                             dt_list,
+                             solver,
+                             no_click):
+    sim_list = [DimerGutzwillerLockedParameters(omega_S,
+                                                lmbd_1,
+                                                lmbd_2,
+                                                get_H_S_1(omega_S),
+                                                get_c_ops_1(lmbd_1, lmbd_2, omega_S),
+                                                psi0,
+                                                t_eval,
+                                                ntraj,
+                                                solver,
+                                                dt,
+                                                no_click,
+                                                get_c_ops_1(lmbd_1, lmbd_2, omega_S, multi=True)[1])
+                for lmbd_1, lmbd_2, omega_S, psi0, t_eval, ntraj, dt 
+                in itertools.product(lmbd_1_list,
+                                     lmbd_2_list,
+                                     omega_S_list,
+                                     psi0_list,
+                                     t_eval_list,
+                                     ntraj_list,
+                                     dt_list)]
+    
+    return sim_list
 
 
 def get_sim_list(lmbd_1_list,
