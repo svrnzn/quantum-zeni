@@ -1,0 +1,13 @@
+# Basic style for MSc Thesis manuscript
+# Text
+text.usetex : True
+font.family : serif
+font.size : 10
+# Graphs
+lines.linewidth : 2
+lines.markersize: 5
+# Colour maps
+# image.cmap : PiYG
+# Misc
+legend.frameon : False
+
