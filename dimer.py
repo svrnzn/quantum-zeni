@@ -38,6 +38,22 @@ class DimerGutzwillerLockedParameters(DimerParameters):
     solver = "gutzwiller-locked"
 
 
+def states_to_yz_bloch(states):
+    r_l = np.empty(len(states))
+    t_l = np.empty(len(states))
+    r_r = np.empty(len(states))
+    t_r = np.empty(len(states))
+    for j, psi in enumerate(states):
+        pstate_l = psi.ptrace(0)
+        pstate_r = psi.ptrace(1)
+        r_l[j], t_l[j] = pstate_to_yz_bloch(pstate_l)
+        r_r[j], t_r[j] = pstate_to_yz_bloch(pstate_r)
+
+    output = np.array([[r_l, t_l], [r_r, t_r]])
+
+    return output
+
+
 def pstate_to_yz_bloch(pstate):
     y = 2 * pstate[1, 0].imag
     z = (pstate[0, 0] - pstate[1, 1]).real
@@ -45,6 +61,15 @@ def pstate_to_yz_bloch(pstate):
     theta = np.arctan2(y, z)
     
     return r, theta
+
+
+def thetas_to_state(tl, tr):
+    o = qutip.basis(2, 0)
+    i = qutip.basis(2, 1)
+    psil = np.cos(tl/2) * o + 1j * np.sin(tl/2) * i
+    psir = np.cos(tr/2) * o + 1j * np.sin(tr/2) * i
+
+    return qutip.tensor(psil, psir)
 
 
 def get_H_S(omega_S):
