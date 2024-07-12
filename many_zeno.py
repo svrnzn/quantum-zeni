@@ -95,6 +95,9 @@ class ManyZenoTrotter(ManyZeno):
         state = psi0
         traj = len(tlist) * [psi0]
         t_idx = 0
+        if np.isclose(0, tlist[0]):
+            traj[0] = state
+            t_idx += 1
         for i, t in enumerate(np.arange(0, tlist[-1]+self.dt/2, self.dt)):
             if np.isclose(t, tlist[t_idx]):
                 traj[t_idx] = state
