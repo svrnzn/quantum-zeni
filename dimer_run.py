@@ -3,7 +3,7 @@ import dimer
 import many_zeno
 import dimer_gutzwiller
 from pickle import dump
-import concurrent
+import concurrent.futures
 
 
 def run_simulation(sp):
