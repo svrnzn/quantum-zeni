@@ -29,8 +29,10 @@ class ManyZenoMcsolve(ManyZeno):
                              tlist,
                              self.c_ops,
                              ntraj=ntraj,
-                             options={"keep_runs_results" : True,
-                                      "norm_steps" : 10})
+                             options={'store_states' : False,
+                                      'store_final_state' : True,
+                                      'keep_runs_results' : True,
+                                      'norm_steps' : 10})
 
 
 class ManyZenoTrotter(ManyZeno):

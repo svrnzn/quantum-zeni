@@ -38,29 +38,32 @@ class DimerGutzwillerLockedParameters(DimerParameters):
     solver = "gutzwiller-locked"
 
 
-def states_to_yz_bloch(states):
-    r_l = np.empty(len(states))
-    t_l = np.empty(len(states))
-    r_r = np.empty(len(states))
-    t_r = np.empty(len(states))
-    for j, psi in enumerate(states):
-        pstate_l = psi.ptrace(0)
-        pstate_r = psi.ptrace(1)
-        r_l[j], t_l[j] = pstate_to_yz_bloch(pstate_l)
-        r_r[j], t_r[j] = pstate_to_yz_bloch(pstate_r)
+@np.vectorize
+def entropy_of_entanglement(state):
+    pstate_l = state.ptrace(0)
+    eoe = qutip.entropy_vn(pstate_l, base=2)
 
-    output = np.array([[r_l, t_l], [r_r, t_r]])
-
-    return output
+    return eoe
 
 
+@np.vectorize(signature='()->(2)')
 def pstate_to_yz_bloch(pstate):
     y = 2 * pstate[1, 0].imag
     z = (pstate[0, 0] - pstate[1, 1]).real
     r = np.sqrt(y**2 + z**2)
-    theta = np.arctan2(y, z)
-    
-    return r, theta
+    th = np.arctan2(y, z)
+
+    return np.array([r, th])
+
+
+@np.vectorize(signature='()->(2, 2)')
+def state_to_yz_bloch(state):
+    pstate_l = state.ptrace(0)
+    pstate_r = state.ptrace(1)
+    r_l, t_l = pstate_to_yz_bloch(pstate_l)
+    r_r, t_r = pstate_to_yz_bloch(pstate_r)
+
+    return np.array([[r_l, t_l], [r_r, t_r]])
 
 
 def thetas_to_state(tl, tr):
