@@ -1,6 +1,6 @@
 import numpy as np
 import qutip
-from qze.many_zeno import ManyZenoTrotter, MZTrotterResult
+from .many_zeno import ManyZenoTrotter, MZTrotterResult
 
 
 class DimerGutzwiller(ManyZenoTrotter):

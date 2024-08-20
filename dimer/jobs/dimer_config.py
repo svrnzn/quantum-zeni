@@ -3,11 +3,14 @@ import qutip
 
 
 # lmbd_1_list = [0, .7, 1.1, 2/np.sqrt(3), 1.5, 3]
-# lmbd_1_list = [0.5, 1.5]
-lmbd_1_list = np.linspace(0, 2, 9)
+lmbd_1_list = np.array([.5, 1.5])
+# lmbd_1_list = np.linspace(0, 2, 17)
+# lmbd_1_list = np.arange(1/8, 2, .25)
 # lmbd_2_list = [0, .7, 1.4, 1.75, 3.]
-# lmbd_2_list = [0.5, 1.5]
-lmbd_2_list = np.linspace(0, 2, 9)
+lmbd_2_list = np.array([0.5, 1.5])
+# lmbd_2_list = np.linspace(10.5, 14, 8)
+# lmbd_2_list = np.linspace(0, 3, 25)
+# lmbd_2_list = np.array([.25])
 ntraj_list= [10**5]
 omega_S_list = [1]
 
