@@ -25,7 +25,7 @@ class DimerParameters:
                   f"omega_S={self.omega_S:.2f}-"
                   f"lmbd_1={self.lmbd_1:.2f}-"
                   f"lmbd_2={self.lmbd_2:.2f}-"
-                  f"T={self.t_eval[-1]}-"
+                  f"T={self.t_eval[-1]:.0f}-"
                   f"ntraj={self.ntraj}-"
                   f"dt={self.dt}")
         
