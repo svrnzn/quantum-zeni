@@ -1,0 +1,5 @@
+# Figures
+figure.figsize : 4.7244, 2.3622 # i.e. 12/2.54, 6/2.54
+# Legend
+# legend.fontsize : 8
+

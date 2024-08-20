@@ -1,0 +1,4 @@
+# Figures
+# figure.autolayout : True
+figure.figsize : 3.1496, 3.1496 # i.e. 8/2.54, 8/2.54
+

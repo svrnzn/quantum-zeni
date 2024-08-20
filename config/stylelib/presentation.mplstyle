@@ -1,0 +1,12 @@
+# Basic style for MSc Thesis presentation
+# Text
+text.usetex : True
+font.family : sans-serif
+font.size : 6
+# Graphs
+lines.linewidth : .75
+# Colour maps
+image.cmap : PiYG
+# Misc
+legend.frameon : False
+
