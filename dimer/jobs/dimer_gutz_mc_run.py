@@ -22,16 +22,26 @@ def run_simulation(sp):
 
 
 if __name__ == "__main__":
+    import sys
+
     sim_list = [DimerGutzMCParameters(c.omega_S,
                                       lmbd_1,
                                       lmbd_2,
                                       c.walk_pos0,
                                       c.dt,
                                       c.T,
-                                      c.nwalk)
-                for lmbd_1, lmbd_2 in c.lambdas]
+                                      c.nwalk,
+                                      simid)
+                for (lmbd_1, lmbd_2) in c.lambdas
+                for simid in range(c.Nsim)]
 
-    with concurrent.futures.ProcessPoolExecutor() as executor:
-        executor.map(run_simulation, sim_list)
+    if len(sys.argv) == 1:
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            executor.map(run_simulation, sim_list)
 
-    # run_simulation(sim_list[0])
+    elif sys.argv[1] == '--debug':
+        print('Running a single simulation for debugging purposes.')
+        run_simulation(sim_list[0])
+    
+    else:
+        print('Invalid options. Try again.')

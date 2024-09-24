@@ -11,6 +11,7 @@ class DimerGutzMCParameters:
     dt : float
     T : np.array
     nwalk : int
+    simid : int
 
 
     def __str__(self):
@@ -21,7 +22,8 @@ class DimerGutzMCParameters:
                   f"lmbd_2={self.lmbd_2:.2f}-"
                   f"dt={self.dt}-"
                   f"T={self.T}-"
-                  f"nwalk={self.nwalk}")
+                  f"nwalk={self.nwalk}-"
+                  f"simid={self.simid}")
         
         return f_name
 
