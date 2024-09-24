@@ -1,7 +1,12 @@
 import numpy as np
 
-Nsim = 1
+# Maximum number of parallel processes to use in the simulation.
+max_workers = 4
 
+# Number of simulations with the same parameters.
+Nsim = 4
+
+# Simulation parameters.
 nwalk = 10**3
 T = 20
 dt = .01

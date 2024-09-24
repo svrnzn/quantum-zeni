@@ -36,7 +36,7 @@ if __name__ == "__main__":
                 for simid in range(c.Nsim)]
 
     if len(sys.argv) == 1:
-        with concurrent.futures.ProcessPoolExecutor() as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=c.max_workers) as executor:
             executor.map(run_simulation, sim_list)
 
     elif sys.argv[1] == '--debug':
