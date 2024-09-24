@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 import numpy as np
-import itertools
-
 
 
 @dataclass
-class DimerGutzwillerMCParameters:
+class DimerGutzMCParameters:
     omega_S : float
     lmbd_1 : float
     lmbd_2 : float
@@ -17,7 +15,7 @@ class DimerGutzwillerMCParameters:
 
     def __str__(self):
         f_name = ("dimer-"
-                  f"solver=gutzwiller-mc-"
+                  f"solver=gutz-mc-"
                   f"omega_S={self.omega_S:.2f}-"
                   f"lmbd_1={self.lmbd_1:.2f}-"
                   f"lmbd_2={self.lmbd_2:.2f}-"
@@ -28,7 +26,7 @@ class DimerGutzwillerMCParameters:
         return f_name
 
 
-class DimerGutzwiller:
+class DimerGutzMc():
 
 
     def __init__(self, dt, lmbd_1, lmbd_2, omega_S=1):
@@ -36,23 +34,8 @@ class DimerGutzwiller:
         self.lmbd_1 = lmbd_1
         self.lmbd_2 = lmbd_2
         self.omega_S = omega_S
+        self.rng = np.random.default_rng()
 
-
-    def omega(self, tl, tr):
-        out = 2*self.omega_S * (1
-                                + (self.lmbd_1
-                                   + self.lmbd_2*np.sin(tr/2)**2)
-                                   * np.sin(tl))
-        
-        return out
-    
-
-    def f_dimer(self, tl, tr):
-        oml = self.omega(tl, tr)
-        omr = self.omega(tr, tl)
-    
-        return np.array([oml, omr])
-    
 
     def click_prob_1(self, th):
         cp = self.dt*4*self.omega_S*self.lmbd_1 * np.sin(th/2)**2
@@ -67,37 +50,39 @@ class DimerGutzwiller:
         return cp
 
 
-class DimerGutzwillerMc(DimerGutzwiller):
+    def unitary_drift(self, walk_pos):
+        return walk_pos - 2*self.omega_S*self.dt
 
 
-    def __init__(self, dt, lmbd_1, lmbd_2, omega_S=1):
-        super().__init__(dt, lmbd_1, lmbd_2, omega_S)
-        self.rng = np.random.default_rng()
+    def m0_drift(self, walk_pos):
+        tl, tr = walk_pos.T
+        out = (self.lmbd_1 + self.lmbd_2*np.sin(tr/2)**2) * np.sin(tl) * self.dt
+
+        return 2 * self.omega_S * out
 
 
-    def drift(self, walk_pos):
-        th_l = walk_pos[:, 0]
-        th_r = walk_pos[:, 1]
-        k1 = -self.f_dimer(th_l, th_r)
-        k2 = -self.f_dimer(th_l + self.dt*k1[0]/2, th_r + self.dt*k1[1]/2)
-        k3 = -self.f_dimer(th_l + self.dt*k2[0]/2, th_r + self.dt*k2[1]/2)
-        k4 = -self.f_dimer(th_l + self.dt*k3[0], th_r + self.dt*k3[1])
-        output = walk_pos.T + self.dt/6 * (k1 + 2*k2 + 2*k3 + k4)
+    # def drift(self, walk_pos):
+    #     '''Runge-Kutta'''
+    #     tl = walk_pos[:, 0]
+    #     tr = walk_pos[:, 1]
+    #     k1 = -self.f_dimer(tl, tr)
+    #     k2 = -self.f_dimer(tl + self.dt*k1[0]/2, tr + self.dt*k1[1]/2)
+    #     k3 = -self.f_dimer(tl + self.dt*k2[0]/2, tr + self.dt*k2[1]/2)
+    #     k4 = -self.f_dimer(tl + self.dt*k3[0], tr + self.dt*k3[1])
+    #     output = walk_pos.T + self.dt/6 * (k1 + 2*k2 + 2*k3 + k4)
 
-        return output.T
+    #     return output.T
 
 
     def evolve(self, t, walk_pos0):
         walk_pos = walk_pos0
         for i in range(int(t/self.dt)):
-            th_l = walk_pos[:, 0]
-            th_r = walk_pos[:, 1]
-            walk_pos += - self.f_dimer(th_l, th_r).T * self.dt
-            # walk_pos = self.drift(walk_pos)
-
-            cp_l = self.click_prob_1(th_l)
-            cp_r = self.click_prob_1(th_r)
-            cp_2 = self.click_prob_2(th_l, th_r)
+            walk_pos = self.unitary_drift(walk_pos)
+            tl = walk_pos[:, 0]
+            tr = walk_pos[:, 1]
+            cp_l = self.click_prob_1(tl)
+            cp_r = self.click_prob_1(tr)
+            cp_2 = self.click_prob_2(tl, tr)
             rs = self.rng.random(len(walk_pos))
             clicks_l = rs < cp_l
             clicks_r = np.logical_and(rs > cp_l, rs < cp_l + cp_r)
@@ -109,6 +94,8 @@ class DimerGutzwillerMc(DimerGutzwiller):
                     walk_pos[i, 1] = np.pi
                 elif c2:
                     walk_pos[i] = np.pi * np.ones(2)
+                else: # Apply M0
+                    walk_pos[i] = self.m0_drift(walk_pos[i])
 
         return walk_pos
 
@@ -123,7 +110,7 @@ if __name__ == "__main__":
 
     walk_pos0 = np.array(nwalk * [[np.pi, np.pi]])
 
-    dgmc = DimerGutzwillerMc(dt, lmbd_1, lmbd_2)
+    dgmc = DimerGutzMc(dt, lmbd_1, lmbd_2)
 
     walk_pos = dgmc.evolve(T, walk_pos0)
     print(walk_pos)

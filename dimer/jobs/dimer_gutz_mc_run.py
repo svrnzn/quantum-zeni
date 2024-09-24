@@ -1,13 +1,13 @@
 import numpy as np
-import dimer_gutzwiller_mc_config as c
-from qze.dimer_gutzwiller_mc import DimerGutzwillerMCParameters, DimerGutzwillerMc
+import dimer_gutz_mc_config as c
+from qze.dimer_gutz_mc import DimerGutzMCParameters, DimerGutzMc
 from pickle import dump
 import concurrent.futures
 
 
 def run_simulation(sp):
     
-    dgmc = DimerGutzwillerMc(sp.dt, sp.lmbd_1, sp.lmbd_2, sp.omega_S)
+    dgmc = DimerGutzMc(sp.dt, sp.lmbd_1, sp.lmbd_2, sp.omega_S)
     walk_pos = dgmc.evolve(sp.T, sp.walk_pos0)
     # The following is the right way to periodicise. The more naiive ways fail.
     # The way to see it is the fact that edges always collapse to the left.
@@ -18,17 +18,17 @@ def run_simulation(sp):
     dump([sp, walk_pos], f)
     f.close()
 
-    print(f"Sumulation #{str(sp)} finished successfully.")
+    print(f"Simulation #{str(sp)} finished successfully.")
 
 
 if __name__ == "__main__":
-    sim_list = [DimerGutzwillerMCParameters(c.omega_S,
-                                            lmbd_1,
-                                            lmbd_2,
-                                            c.walk_pos0,
-                                            c.dt,
-                                            c.T,
-                                            c.nwalk)
+    sim_list = [DimerGutzMCParameters(c.omega_S,
+                                      lmbd_1,
+                                      lmbd_2,
+                                      c.walk_pos0,
+                                      c.dt,
+                                      c.T,
+                                      c.nwalk)
                 for lmbd_1, lmbd_2 in c.lambdas]
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
