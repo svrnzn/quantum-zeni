@@ -1,9 +1,8 @@
 import numpy as np
-import dimer_config as c
 from qze import dimer
 from qze import many_zeno
 from qze import dimer_gutzwiller
-from pickle import dump
+# from pickle import dump
 import concurrent.futures
 
 
@@ -35,6 +34,10 @@ def run_simulation(sp):
     
 
     states = np.array(results.runs_final_states, dtype=object)
+
+    # if sp.store_states:
+    #     output['states'] = states
+
     print('Computing Bloch Sphere coordinates.')
     bloch_coords = dimer.state_to_yz_bloch(states)
 
@@ -42,33 +45,49 @@ def run_simulation(sp):
                   bloch_coords=bloch_coords)
 
     if sp.solver == "mcsolve" or sp.solver == "trsolve":
+        # if sp.compute_eentropy:
         print('Computing Entropy of Entanglement.')
         entropy_of_entanglement = dimer.entropy_of_entanglement(states)
         output['entropy_of_entanglement'] = entropy_of_entanglement
 
-    # if sp.store_states:
-    #     output['states'] = states
+        # if sp.compute_fidelity:
+        print('Computing Fidelity.')
+        fidelity = dimer.fidelity(states)
+        output['fidelity'] = fidelity
 
-    f = open(f"data/{str(sp)}.pkl", "wb")
-    dump(output, f)
+
+    # f = open(f"data/{str(sp)}.pkl", "wb")
+    # dump(output, f)
+    f = open(f"data/{str(sp)}.npz", "wb")
+    np.savez(f,
+             bloch_coords=bloch_coords,
+             entropy_of_entanglement=entropy_of_entanglement,
+             fidelity=fidelity)
     f.close()
 
     print(f"Sumulation #{str(sp)} finished successfully.")
 
 
 if __name__ == "__main__":
-    sim_list = dimer.get_sim_list(c.lmbd_1_list,
-                                  c.lmbd_2_list,
-                                  c.omega_S_list,
-                                  c.psi0_list,
-                                  c.t_eval_list,
-                                  c.ntraj_list,
-                                  c.dt_list,
+    import sys
+    import dimer_config as c
+
+    sim_list = dimer.get_sim_list(c.lambdas,
+                                  c.omega_S,
+                                  c.psi0,
+                                  c.t_eval,
+                                  c.ntraj,
+                                  c.dt,
                                   c.solver,
                                   c.no_click)
+
+    if len(sys.argv) == 1:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=c.max_workers) as executor:
+            executor.map(run_simulation, sim_list)
+
+    elif sys.argv[1] == '--debug':
+        print('Running a single simulation for debugging purposes.')
+        run_simulation(sim_list[-1])
     
-
-    with concurrent.futures.ProcessPoolExecutor(max_workers=4) as executor:
-        executor.map(run_simulation, sim_list)
-
-    # run_simulation(sim_list[0])
+    else:
+        print('Invalid options. Try again.')
