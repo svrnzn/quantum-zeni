@@ -65,7 +65,7 @@ def run_simulation(sp):
              fidelity=fidelity)
     f.close()
 
-    print(f"Sumulation #{str(sp)} finished successfully.")
+    print(f"Simulation #{str(sp)} finished successfully.")
 
 
 if __name__ == "__main__":
