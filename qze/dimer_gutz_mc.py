@@ -57,13 +57,13 @@ class DimerGutzMc():
 
 
     def m0_drift(self, walk_pos):
-        tl, tr = walk_pos
+        tl, tr = walk_pos.T
 
         # Compute drifts.
         dl = (self.lmbd_1 + self.lmbd_2*np.sin(tr/2)**2) * np.sin(tl) * self.dt
         dr = (self.lmbd_1 + self.lmbd_2*np.sin(tl/2)**2) * np.sin(tr) * self.dt
 
-        drift = - 2 * self.omega_S * np.array([dl, dr])
+        drift = - 2 * self.omega_S * np.array([dl, dr]).T
 
         return walk_pos + drift
 
@@ -101,8 +101,11 @@ class DimerGutzMc():
                     walk_pos[j, 1] = np.pi
                 elif c2:
                     walk_pos[j] = np.pi * np.ones(2)
-                else: # Apply M0
-                    walk_pos[j] = self.m0_drift(walk_pos[j])
+
+            # Apply M0 to walkers that did not click.
+            clicks = np.logical_or(clicks_l, clicks_r, clicks_2)
+            no_clicks = np.logical_not(clicks)
+            walk_pos[no_clicks] = self.m0_drift(walk_pos[no_clicks])
 
             if (i+1) % 100 == 0:
                 print(f'Step #{i+1} of {int(t/self.dt)} completed.')
