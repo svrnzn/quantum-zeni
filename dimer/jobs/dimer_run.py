@@ -1,8 +1,7 @@
 import numpy as np
 from qze import dimer
 from qze import many_zeno
-from qze import dimer_gutzwiller
-# from pickle import dump
+from qze import dimer_gutz_mc_qutip
 import concurrent.futures
 
 
@@ -24,13 +23,13 @@ def run_simulation(sp):
                                     sp.no_click)
         
     elif sp.solver == "gutzwiller":
-        results = dimer_gutzwiller.gusolve(sp.H_S,
-                                           sp.psi0,
-                                           sp.dt,
-                                           sp.t_eval,
-                                           sp.c_ops,
-                                           sp.ntraj,
-                                           sp.no_click)
+        results = dimer_gutz_mc_qutip.gusolve(sp.H_S,
+                                              sp.psi0,
+                                              sp.dt,
+                                              sp.t_eval,
+                                              sp.c_ops,
+                                              sp.ntraj,
+                                              sp.no_click)
     
 
     states = np.array(results.runs_final_states, dtype=object)
@@ -79,7 +78,8 @@ if __name__ == "__main__":
                                   c.ntraj,
                                   c.dt,
                                   c.solver,
-                                  c.no_click)
+                                  c.no_click,
+                                  c.nsim)
 
     if len(sys.argv) == 1:
         with concurrent.futures.ProcessPoolExecutor(max_workers=c.max_workers) as executor:
