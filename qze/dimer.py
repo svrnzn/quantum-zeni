@@ -1,7 +1,6 @@
 import numpy as np
 import qutip
 from dataclasses import dataclass
-import itertools
 
 
 @dataclass
@@ -17,6 +16,7 @@ class DimerParameters:
     solver : str
     dt : float = None
     no_click : bool = False
+    simid : int = 0
 
 
     def __str__(self):
@@ -27,7 +27,8 @@ class DimerParameters:
                   f"lmbd_2={self.lmbd_2:.2f}-"
                   f"T={self.t_eval[-1]:.0f}-"
                   f"ntraj={self.ntraj}-"
-                  f"dt={self.dt}")
+                  f"dt={self.dt}-"
+                  f"simid={self.simid}")
         
         return f_name
 
@@ -150,7 +151,8 @@ def get_gutz_locked_sim_list(lambdas,
                              ntraj,
                              dt,
                              solver,
-                             no_click):
+                             no_click,
+                             nsim=1):
     sim_list = [DimerGutzwillerLockedParameters(omega_S,
                                                 lmbd_1,
                                                 lmbd_2,
@@ -162,8 +164,9 @@ def get_gutz_locked_sim_list(lambdas,
                                                 solver,
                                                 dt,
                                                 no_click,
+                                                simid,
                                                 get_c_ops_1(lmbd_1, lmbd_2, omega_S, multi=True)[1])
-                for lmbd_1, lmbd_2 in lambdas]
+                for lmbd_1, lmbd_2 in lambdas for simid in range(nsim)]
     
     return sim_list
 
@@ -175,7 +178,8 @@ def get_sim_list(lambdas,
                  ntraj,
                  dt,
                  solver,
-                 no_click):
+                 no_click,
+                 nsim=1):
     sim_list = [DimerParameters(omega_S,
                                 lmbd_1,
                                 lmbd_2,
@@ -186,7 +190,8 @@ def get_sim_list(lambdas,
                                 ntraj,
                                 solver,
                                 dt,
-                                no_click)
-                for lmbd_1, lmbd_2 in lambdas]
+                                no_click,
+                                simid)
+                for lmbd_1, lmbd_2 in lambdas for simid in range(nsim)]
     
     return sim_list
