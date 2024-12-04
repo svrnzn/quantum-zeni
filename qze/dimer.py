@@ -1,7 +1,6 @@
 import numpy as np
 import qutip
 from dataclasses import dataclass
-import itertools
 
 
 @dataclass
@@ -17,6 +16,7 @@ class DimerParameters:
     solver : str
     dt : float = None
     no_click : bool = False
+    simid : int = 0
 
 
     def __str__(self):
@@ -27,7 +27,8 @@ class DimerParameters:
                   f"lmbd_2={self.lmbd_2:.2f}-"
                   f"T={self.t_eval[-1]:.0f}-"
                   f"ntraj={self.ntraj}-"
-                  f"dt={self.dt}")
+                  f"dt={self.dt}-"
+                  f"simid={self.simid}")
         
         return f_name
 
@@ -36,6 +37,18 @@ class DimerParameters:
 class DimerGutzwillerLockedParameters(DimerParameters):
     c_ops_multi : list[int] = None
     solver = "gutzwiller-locked"
+
+
+@np.vectorize
+def fidelity(state):
+    bloch_yz = state_to_yz_bloch(state)
+    tl = bloch_yz[0, 1]
+    tr = bloch_yz[1, 1]
+    gutz_state = thetas_to_rho(tl, tr)
+    vfidelity = np.vectorize(qutip.fidelity)
+    f = vfidelity(gutz_state, state)
+
+    return f
 
 
 @np.vectorize
@@ -64,6 +77,17 @@ def state_to_yz_bloch(state):
     r_r, t_r = pstate_to_yz_bloch(pstate_r)
 
     return np.array([[r_l, t_l], [r_r, t_r]])
+
+
+@np.vectorize
+def thetas_to_rho(tl, tr):
+    o = qutip.basis(2, 0)
+    i = qutip.basis(2, 1)
+    psil = np.cos(tl/2) * o + 1j * np.sin(tl/2) * i
+    psir = np.cos(tr/2) * o + 1j * np.sin(tr/2) * i
+    rho = qutip.tensor(psil * psil.dag(), psir * psir.dag())
+
+    return rho
 
 
 def thetas_to_state(tl, tr):
@@ -121,15 +145,15 @@ def get_c_ops_1(lmbd_1, lmbd_2, omega_S, multi=False):
         return [c1, c11]
 
 
-def get_gutz_locked_sim_list(lmbd_1_list,
-                             lmbd_2_list,
-                             omega_S_list,
-                             psi0_list,
-                             t_eval_list,
-                             ntraj_list,
-                             dt_list,
+def get_gutz_locked_sim_list(lambdas,
+                             omega_S,
+                             psi0,
+                             t_eval,
+                             ntraj,
+                             dt,
                              solver,
-                             no_click):
+                             no_click,
+                             nsim=1):
     sim_list = [DimerGutzwillerLockedParameters(omega_S,
                                                 lmbd_1,
                                                 lmbd_2,
@@ -141,28 +165,22 @@ def get_gutz_locked_sim_list(lmbd_1_list,
                                                 solver,
                                                 dt,
                                                 no_click,
+                                                simid,
                                                 get_c_ops_1(lmbd_1, lmbd_2, omega_S, multi=True)[1])
-                for lmbd_1, lmbd_2, omega_S, psi0, t_eval, ntraj, dt 
-                in itertools.product(lmbd_1_list,
-                                     lmbd_2_list,
-                                     omega_S_list,
-                                     psi0_list,
-                                     t_eval_list,
-                                     ntraj_list,
-                                     dt_list)]
+                for lmbd_1, lmbd_2 in lambdas for simid in range(nsim)]
     
     return sim_list
 
 
-def get_sim_list(lmbd_1_list,
-                 lmbd_2_list,
-                 omega_S_list,
-                 psi0_list,
-                 t_eval_list,
-                 ntraj_list,
-                 dt_list,
+def get_sim_list(lambdas,
+                 omega_S,
+                 psi0,
+                 t_eval,
+                 ntraj,
+                 dt,
                  solver,
-                 no_click):
+                 no_click,
+                 nsim=1):
     sim_list = [DimerParameters(omega_S,
                                 lmbd_1,
                                 lmbd_2,
@@ -173,14 +191,8 @@ def get_sim_list(lmbd_1_list,
                                 ntraj,
                                 solver,
                                 dt,
-                                no_click)
-                for lmbd_1, lmbd_2, omega_S, psi0, t_eval, ntraj, dt 
-                in itertools.product(lmbd_1_list,
-                                     lmbd_2_list,
-                                     omega_S_list,
-                                     psi0_list,
-                                     t_eval_list,
-                                     ntraj_list,
-                                     dt_list)]
+                                no_click,
+                                simid)
+                for lmbd_1, lmbd_2 in lambdas for simid in range(nsim)]
     
     return sim_list

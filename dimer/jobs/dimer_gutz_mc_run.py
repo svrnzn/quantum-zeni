@@ -1,7 +1,7 @@
 import numpy as np
 import dimer_gutz_mc_config as c
 from qze.dimer_gutz_mc import DimerGutzMCParameters, DimerGutzMc
-from pickle import dump
+# from pickle import dump
 import concurrent.futures
 
 
@@ -14,8 +14,11 @@ def run_simulation(sp):
     # If we want them to collapse to the right we have to mirror the calculation twice.
     walk_pos = -((-walk_pos+np.pi) % (2*np.pi) - np.pi)
 
-    f = open(f"data/{str(sp)}.pkl", "wb")
-    dump([sp, walk_pos], f)
+    # f = open(f"data/{str(sp)}.pkl", "wb")
+    # dump([sp, walk_pos], f)
+    f = open(f"data/{str(sp)}.npz", "wb")
+    np.savez(f,
+             walk_pos=walk_pos)
     f.close()
 
     print(f"Simulation #{str(sp)} finished successfully.")
@@ -41,7 +44,7 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == '--debug':
         print('Running a single simulation for debugging purposes.')
-        run_simulation(sim_list[0])
+        run_simulation(sim_list[-1])
     
     else:
         print('Invalid options. Try again.')

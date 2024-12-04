@@ -15,7 +15,9 @@ class SimulationParameters:
     POVM : list[qutip.Qobj]
 
 
-lmbd_list = [.7, 1.1, 2/np.sqrt(3), 1.5, 3]
+# lmbd_list = [.7, 1.1, 2/np.sqrt(3), 1.5, 3]
+lmbd_list = [.7, 1.1, 3]
+# lmbd_list = [2.1]
 Nt = 10**4
 T = 10
 dt = .01

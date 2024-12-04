@@ -23,7 +23,7 @@ class ManyZenoMcsolve(ManyZeno):
         super().__init__(H_S, c_ops)
 
 
-    def run(self, psi0, tlist, ntraj):
+    def run(self, psi0, tlist, ntraj, map='parallel'):
         return qutip.mcsolve(self.H_S,
                              psi0,
                              tlist,
@@ -32,6 +32,7 @@ class ManyZenoMcsolve(ManyZeno):
                              options={'store_states' : False,
                                       'store_final_state' : True,
                                       'keep_runs_results' : True,
+                                      'map' : map,
                                       'norm_steps' : 10})
 
 
@@ -124,8 +125,8 @@ def trsolve(H_S, psi0, dt, tlist, c_ops, ntraj=500, no_click=False):
     return output
 
 
-def mcsolve(H_S, psi0, tlist, c_ops, ntraj=500):
+def mcsolve(H_S, psi0, tlist, c_ops, ntraj=500, map='parallel'):
     mzm = ManyZenoMcsolve(H_S, c_ops)
-    results = mzm.run(psi0, tlist, ntraj)
+    results = mzm.run(psi0, tlist, ntraj, map=map)
 
     return results
