@@ -127,6 +127,6 @@ def trsolve(H_S, psi0, dt, tlist, c_ops, ntraj=500, no_click=False):
 
 def mcsolve(H_S, psi0, tlist, c_ops, ntraj=500, map='parallel'):
     mzm = ManyZenoMcsolve(H_S, c_ops)
-    results = mzm.run(psi0, tlist, ntraj)
+    results = mzm.run(psi0, tlist, ntraj, map=map)
 
     return results

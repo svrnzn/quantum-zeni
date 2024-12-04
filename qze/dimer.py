@@ -38,6 +38,7 @@ class DimerGutzwillerLockedParameters(DimerParameters):
     c_ops_multi : list[int] = None
     solver = "gutzwiller-locked"
 
+
 @np.vectorize
 def fidelity(state):
     bloch_yz = state_to_yz_bloch(state)

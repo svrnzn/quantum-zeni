@@ -3,6 +3,7 @@ from qze import dimer
 from qze import many_zeno
 from qze import dimer_gutz_mc_qutip
 import concurrent.futures
+import dimer_config as c
 
 
 def run_simulation(sp):
@@ -11,7 +12,8 @@ def run_simulation(sp):
                                     sp.psi0,
                                     sp.t_eval,
                                     sp.c_ops,
-                                    sp.ntraj)
+                                    sp.ntraj,
+                                    map=c.mcsolve_map)
 
     elif sp.solver == "trsolve":
         results = many_zeno.trsolve(sp.H_S,

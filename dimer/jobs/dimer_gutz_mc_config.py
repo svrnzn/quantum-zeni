@@ -1,13 +1,13 @@
 import numpy as np
 
 # Maximum number of parallel processes to use in the simulation.
-max_workers = 4
+max_workers = 2
 
 # Number of simulations with the same parameters.
-Nsim = 4
+Nsim = 1
 
 # Simulation parameters.
-nwalk = 10**3
+nwalk = int(2 * 10**7)
 
 lambdas = [[.25, .25],
            [.25, 1.75],
