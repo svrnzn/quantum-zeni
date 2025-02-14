@@ -33,17 +33,14 @@ def flow_potential_hessian(t_l, t_r, lmbd_1, lmbd_2):
     return H
 
 
-def omega(self, tl, tr):
-        out = 2*self.omega_S * (1
-                                + (self.lmbd_1
-                                   + self.lmbd_2*np.sin(tr/2)**2)
-                                   * np.sin(tl))
+def omegal(lamb1, lamb2, tl, tr):
+        out = 2 * (1 + (lamb1 + lamb2*np.sin(tr/2)**2) * np.sin(tl))
         
         return out
     
 
-def f_dimer(self, tl, tr):
-    oml = self.omega(tl, tr)
-    omr = self.omega(tr, tl)
+def f_dimer(lamb1, lamb2, tl, tr):
+    oml = omegal(lamb1, lamb2, tl, tr)
+    omr = omegal(lamb1, lamb2, tr, tl)
 
-    return np.array([oml, omr])
+    return -np.array([oml, omr])

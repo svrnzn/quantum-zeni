@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 # %%
 # Statistics
-ntraj = 10**7
+ntraj = 10**2
 
 # Physical parameters.
 lambdas = [[.25, 1.75]]
