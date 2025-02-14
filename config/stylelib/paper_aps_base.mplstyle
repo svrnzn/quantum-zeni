@@ -1,0 +1,8 @@
+# Basic style for APS papers
+# Text
+text.usetex : True
+font.family : serif
+font.size : 8
+# Graphs
+lines.linewidth : 1.2
+lines.markersize: 5
