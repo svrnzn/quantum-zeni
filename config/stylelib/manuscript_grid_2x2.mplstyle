@@ -1,4 +1,4 @@
 # Figures
 figure.figsize : 4.7244, 4.7244 # i.e. 12/2.54, 12/2.54
-lines.linewidth : 1
-lines.markersize : 2.5
+lines.linewidth : 1.2
+lines.markersize : 4

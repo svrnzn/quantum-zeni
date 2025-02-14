@@ -1,0 +1,3 @@
+# Figures
+figure.figsize : 3.375, 3.375
+axes.labelpad : 4.0
